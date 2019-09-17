@@ -1,8 +1,8 @@
 #ifndef SETUP_H
 #define SETUP_H
 
-#define _XTAL_FREQ 11520000
-
+#define _XTAL_FREQ 11059200
+#pragma config MCLRE=OFF, FOSC=HS, WDTE=OFF, BOREN=ON, LVP=OFF, PWRTE=ON
 
 // analog ports
 #define S0 RA0
@@ -16,9 +16,14 @@
 
 #define KEYBOARD_PORT PORTB
 
-#define EN_DISPLAY RC5
-#define EN_IO RC4
-
+void setupPic(void);
 void setupPorts(void);
+void setupAd(void);
+void setupSerial(void);
+void setupEeprom(void);
+void setupDisplay(void);
+void coldStart(void);
+void hotStart(void);
+
 
 #endif

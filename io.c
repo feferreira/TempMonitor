@@ -14,6 +14,11 @@ union {
 
 void setDisplayBack(BackgroundColor color){
     switch(color){
+        case OFF:
+            ioLatch.bits.ledB = 0;
+            ioLatch.bits.ledG = 0;
+            ioLatch.bits.ledR = 0;
+            break;
         case BLUE:
             ioLatch.bits.ledB = 1;
             ioLatch.bits.ledG = 0;

@@ -1,40 +1,38 @@
-/*This file is part of KitPicSenai.
+#ifndef LCD_H
+#define LCD_H
 
-    KitPicSenai is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+#define LCD_PORT    PORTD //port of lcd, in 4 bits mode connect RD[0:4] in DB[4:8]
+#define LCD_EN      PORTDbits.RD6 //enable pin
+#define LCD_RS      PORTDbits.RD4 //RS pin
+#define LCD_RW	    PORTDbits.RD5 //RW pin
+#define LCD_LATCH   PORTCbits.RC5 //Latch enable Pin
 
-    KitPicSenai is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with KitPicSenai.  If not, see <http://www.gnu.org/licenses/>.
- */
-#ifndef _LCD
-#define _LCD
-#include <stdint.h>
-//pinos de saída
-#define RS RD4
-#define RW RD5
-#define EN RD6
-#define PORT PORTD
-#define LATCH RA4
-
-enum lcd{
-    LCD_CHAR_OFFSET = 0x30,
-    LCD_ENABLE_TIME_US = 15
+enum lcd_instruction{
+    LCD_CMD = 0,
+    LCD_CHAR = 1,
+    lcd_4bit = 0x28,
+    lcd_4bit_510 = 0x24, 
+    lcd_clear = 0x01,
+    lcd_home = 0x02,
+    lcd_inc_address = 0x06,
+    lcd_dec_address = 0x04,
+    lcd_rot_left = 0x05,
+    lcd_rot_right = 0x07,
+    lcd_inc_cursor = 0x14,
+    lcd_dec_cursor = 0x10,
+    lcd_off = 0x08,
+    lcd_cursor_on_blink_on = 0x0F,
+    lcd_cursor_on_blink_off = 0x0E,
+    lcd_cursor_off_blink_on = 0x0D,
+    lcd_cursor_off_blink_off = 0x0C
+    
 };
-
-//comandos do lcd
 
 void init_lcd(void);
 void clr_lcd(void);
-void char_lcd(uint8_t);
-void cmd_lcd(uint8_t);
-void text_lcd(const uint8_t *str);
-void number_lcd(uint8_t add, uint8_t data);
+void byte_lcd(char mode, char data); //mode = lcd_cmd or lcd_txt, data = instruction or address
+inline void enable_lcd();
+void create_custom_char(const char *data, char address);
+void text_lcd(const char *);
 
 #endif

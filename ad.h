@@ -5,5 +5,6 @@
 
 void startAdConversion(void);
 uint16_t readAdResult(void);
+uint8_t getTemp(uint8_t sensor);
 
 #endif

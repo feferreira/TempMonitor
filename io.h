@@ -6,6 +6,7 @@
 #define LATCH_BUS PORTD
 
 typedef enum {
+    OFF,
     BLUE,
     GREEN,
     RED,

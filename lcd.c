@@ -1,89 +1,50 @@
-/*This file is part of KitPicSenai.
-
-    KitPicSenai is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    KitPicSenai is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with KitPicSenai.  If not, see <http://www.gnu.org/licenses/>.
- */
-#include <xc.h>
-#include <stdint.h>
 #include "lcd.h"
-#include <pic16f877a.h>
-//#include "setup.h"
+#include <xc.h>
+#include "setup.h"
 
-#define _XTAL_FREQ 11520000
-void init_lcd()
-{
-    LATCH = 1;
-	RS = 0;
-	RW = 0;
-	EN = 0;
-
-	cmd_lcd(0x28);
-	cmd_lcd(0x06);
-	cmd_lcd(0x0D);
-	clr_lcd();
+void init_lcd(){
+    __delay_ms(1000);
+    byte_lcd(LCD_CMD, lcd_4bit);
+    byte_lcd(LCD_CMD, lcd_inc_address);
+    byte_lcd(LCD_CMD, lcd_cursor_off_blink_off);
+    clr_lcd();
 }
 
-void clr_lcd()
-{
-	cmd_lcd(0x01);
-	__delay_ms(500);
-    LATCH = 0;
-}
-void char_lcd(uint8_t txt){
-    LATCH = 1;
-	__delay_ms(10);
-	PORT = (uint8_t)((txt >> 4) & 0x0F);
-	RS = 1;
-	EN = 1;
-    __delay_us(LCD_ENABLE_TIME_US);
-    EN = 0;
-	PORT = (uint8_t)(txt & 0x0F);
-	RS = 1;
-	EN = 1;
-    __delay_us(LCD_ENABLE_TIME_US);
-    EN = 0;
-    LATCH = 0;
+void clr_lcd(){
+    byte_lcd(LCD_CMD, lcd_clear);
+    __delay_ms(100);
 }
 
-void cmd_lcd(uint8_t cmd){
-    LATCH = 1;
-	__delay_ms(10);
-	PORT = (uint8_t)((cmd >> 4) & 0x0F);
-	RS = 0;
-	EN = 1;
-    __delay_us(LCD_ENABLE_TIME_US);
-    EN = 0;
-	PORT = (uint8_t)(cmd & 0x0F);
-	RS = 0;
-	EN = 1;
-    __delay_us(LCD_ENABLE_TIME_US);
-    EN = 0;
-    LATCH = 0;
+void byte_lcd(char mode, char data){
+    LCD_LATCH = 1;
+    LCD_RS = mode;
+	LCD_PORT = (char)((data >> 4) & 0x0F);
+    LCD_RS = mode;
+    enable_lcd();
+    LCD_PORT = (char)(data & 0x0F);
+    LCD_RS = mode;
+    enable_lcd();
+    __delay_us(15);
+    LCD_LATCH = 0;
+
 }
 
-void text_lcd(const uint8_t *str){
+inline void enable_lcd(){
+    LCD_EN = 1;
+    __delay_us(15);
+    LCD_EN = 0;
+}
+
+void text_lcd(const char *str){
     while(*str){
-          char_lcd(*str);
+          byte_lcd(LCD_CHAR, *str);
           ++str;
          }
 }
 
-/*! \brief Display number
-*
-* \param add address
-* \param data number to be displayed		
-*/
-void number_lcd(uint8_t add, uint8_t data){
-    cmd_lcd(add);
-    char_lcd((uint8_t)(data+LCD_CHAR_OFFSET));
+void create_custom_char(const char *data, char address){
+    byte_lcd(LCD_CMD,(unsigned char)(0x40 + (address * 8)));
+    for(char i = 0; i < 8; ++i){
+        byte_lcd(LCD_CHAR, data[i]);
+    }
 }

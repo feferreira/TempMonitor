@@ -13,7 +13,9 @@ uint8_t scanKeys(void){
         KBD_PORT = ~line;
         counterC = 0;
         for(uint8_t column=1; column != 16; column *= 2){
+            uint8_t OldKbd = KBD_PORT;
             if((~(KBD_PORT | 0xF0)) & column){
+                while(OldKbd == KBD_PORT);
                 return keys[counterC][counterL];
             }
             counterC++;

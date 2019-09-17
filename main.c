@@ -1,21 +1,25 @@
 #include <xc.h>
 #include "setup.h"
-#pragma config FOSC=HS, WDTE=OFF, BOREN=OFF, LVP=OFF
+#include "io.h"
+#include "keyboard.h"
+#include "lcd.h"
+#include <stdint.h>
+#include "display.h"
+#include "ad.h"
+#include "menu.h"
+#include "monitor.h"
+#include "serial.h"
 
 void main(){
-    setupPorts();
-    PORTD = 0;
-            EN_IO = 1;
-        EN_DISPLAY = 1;
-        
+    setupPic();
+    uint8_t key;
     while(1){
-        PORTD = 0;
-        for(char x=0;x < 7; x++){
-            PORTD = x;
-                                    EN_IO = 1;
-        EN_DISPLAY = 1;
-            __delay_ms(500);
-
+        monitor();
+        
+        key = scanKeys();
+        if(key=='A'){
+            configMenu();
+            writeOperationMask();
         }
     }
 }
