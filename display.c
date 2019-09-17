@@ -23,9 +23,7 @@ void writeOperationMask(void){
 }
 
 void writeSensorValues(uint8_t sensor, uint8_t value, uint8_t max){
-    byte_lcd(LCD_CMD, 0x84);
-    byte_lcd(LCD_CHAR, 0x30);
-    byte_lcd(LCD_CHAR, sensor+0x31);
+    setSensorNumber(sensor);
     byte_lcd(LCD_CMD, 0xC8);
     byte_lcd(LCD_CHAR, value/100 + 0x30);
     byte_lcd(LCD_CHAR, (value%100)/10 + 0x30);
@@ -38,9 +36,9 @@ void writeSensorValues(uint8_t sensor, uint8_t value, uint8_t max){
 
 void showConfigLimitsMenu(){
     clr_lcd();
-    text_lcd("DEFINIR VALORES");
+    text_lcd("CONFIGURAR");
     byte_lcd(LCD_CMD, 0xC0);
-    text_lcd("MAXIMOS");
+    text_lcd("SENSORES");
 }
 
 void showConfigNsensors(){
@@ -58,5 +56,12 @@ void showChangePassword(void){
 void showChangeParam(void){
     clr_lcd();
     text_lcd("SEN:   MAX:    C");
+    byte_lcd(LCD_CMD, 0xC0);
     text_lcd("ALARM:OFF T:   s");
+}
+
+void setSensorNumber(uint8_t sensor){
+    byte_lcd(LCD_CMD, 0x84);
+    byte_lcd(LCD_CHAR, 0x30);
+    byte_lcd(LCD_CHAR, sensor+0x31);
 }

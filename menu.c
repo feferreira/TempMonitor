@@ -3,6 +3,8 @@
 #include "keyboard.h"
 #include <stdbool.h>
 #include "io.h"
+#include "eeprom.h"
+#include <stdint.h>
 
 bool (*menuPtr)(void);
 
@@ -26,6 +28,10 @@ bool configLimitsMenu(void){
     }
     else if(key == '*'){
         return true;
+    }
+    else if(key == '#'){
+        menuPtr=configSensors;
+        return false;
     }
     return false;
 }
@@ -60,4 +66,18 @@ bool setPassword(void){
         return true;
     }
     return false;
+}
+
+void configSensor(uint8_t sensor){
+    setSensorNumber(sensor);
+}
+
+bool configSensors(void){
+    uint8_t key = '$';
+    showChangeParam();
+    uint8_t numberOfSensors = readE2p(SENSOR_QUANTITY);
+    for (uint8_t i=0; i < numberOfSensors; i++){
+        configSensor(i);
+        while(1);
+    }
 }

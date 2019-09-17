@@ -7,6 +7,7 @@ bool configLimitsMenu(void);
 bool configQuantityMenu(void);
 bool setPassword(void);
 bool getPassword(void);
+bool configSensors(void);
 
 
 #endif
