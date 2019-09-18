@@ -68,16 +68,42 @@ bool setPassword(void){
     return false;
 }
 
-void configSensor(uint8_t sensor){
-    setSensorNumber(sensor);
+bool configSensor(uint8_t sensor){
+    uint8_t key = '$';
+    uint8_t value;
+    bool (*configPtr)(uint8_t *) = configMaxValue;
+    setConfigSensorParam(sensor, readE2p(SENSOR_QUANTITY + sensor), readE2p(SENSOR_QUANTITY + sensor));
+    configPtr(&value);
+    
+    while(1){
+    key = scanKeys();
+    if(key == '#'){
+        configPtr = configPtr == configMaxValue ? configTimeOut : configMaxValue; 
+    }
+    else if(key == '*'){
+        return false;
+    }
+    configPtr(&value);
+    }
+    return true;
+}
+
+bool configMaxValue(uint8_t *value){
+    
+    setConfigSensorParam(2,64,23);
+}
+
+bool configTimeOut(uint8_t *value){
+    setConfigSensorParam(5,33,222);
 }
 
 bool configSensors(void){
-    uint8_t key = '$';
     showChangeParam();
     uint8_t numberOfSensors = readE2p(SENSOR_QUANTITY);
     for (uint8_t i=0; i < numberOfSensors; i++){
-        configSensor(i);
-        while(1);
+        if(!configSensor(i)){
+            return false;
+        }
     }
+    return true;
 }

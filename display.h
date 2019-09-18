@@ -10,5 +10,6 @@ void showConfigNsensors(void);
 void showChangePassword(void);
 void showChangeParam(void);
 void setSensorNumber(uint8_t sensor);
+void setConfigSensorParam(uint8_t sensor, uint8_t time, uint8_t max);
 
 #endif

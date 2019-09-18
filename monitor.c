@@ -10,6 +10,7 @@
 #include "serial.h"
 
 uint8_t maxValues[8];
+uint8_t timeOut[8];
 uint8_t numberOfSensors = 0;
 uint8_t alarm = 0xFF;
 
@@ -17,6 +18,7 @@ void getE2pValues(){
     numberOfSensors = readE2p(SENSOR_QUANTITY);
     for(uint8_t i=0; i < numberOfSensors; i++){
         maxValues[i] = readE2p(MAX_VALUES + i);
+        timeOut[i] = readE2p(TIMEOUT_VALUES + i);
     }
 }
 

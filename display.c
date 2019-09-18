@@ -55,13 +55,26 @@ void showChangePassword(void){
 
 void showChangeParam(void){
     clr_lcd();
-    text_lcd("SEN:   MAX:    C");
+    text_lcd("SEN:   TIME:   s");
     byte_lcd(LCD_CMD, 0xC0);
-    text_lcd("ALARM:OFF T:   s");
+    text_lcd("MAX:    C");
 }
 
 void setSensorNumber(uint8_t sensor){
     byte_lcd(LCD_CMD, 0x84);
     byte_lcd(LCD_CHAR, 0x30);
     byte_lcd(LCD_CHAR, sensor+0x31);
+}
+
+void setConfigSensorParam(uint8_t sensor, uint8_t time, uint8_t max){
+    setSensorNumber(sensor);
+    byte_lcd(LCD_CMD, 0x8C);
+    byte_lcd(LCD_CHAR, time/100 + 0x30);
+    byte_lcd(LCD_CHAR, (time%100)/10 + 0x30);
+    byte_lcd(LCD_CHAR, (time%100)%10 + 0x30);
+    byte_lcd(LCD_CMD, 0xC4);
+    byte_lcd(LCD_CHAR, max/100 + 0x30);
+    byte_lcd(LCD_CHAR, (max%100)/10 + 0x30);
+    byte_lcd(LCD_CHAR, (max%100)%10 + 0x30);
+    
 }
