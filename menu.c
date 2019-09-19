@@ -5,30 +5,34 @@
 #include "io.h"
 #include "eeprom.h"
 #include <stdint.h>
+#include "config.h"
 
 bool (*menuPtr)(void);
+uint8_t key = '$';
 
 void configMenu(void){
-    setDisplayBack(BLUE);
-    uint8_t key = '$';
+    setDisplayBack(YELLOW);
     menuPtr = configLimitsMenu;
     while(!menuPtr());
     setDisplayBack(GREEN);
 }
 
 bool configLimitsMenu(void){
-    uint8_t key = '$';
     showConfigLimitsMenu();
+    key = '$';
     while(key == '$'){
         key = scanKeys();
     }
+    // next Item
     if(key == 'A'){
-        menuPtr=configQuantityMenu;
+        menuPtr=configLimitsMenu;
         return false;
     }
+    // exit
     else if(key == '*'){
         return true;
     }
+    // enter menu
     else if(key == '#'){
         menuPtr=configSensors;
         return false;
@@ -36,74 +40,29 @@ bool configLimitsMenu(void){
     return false;
 }
 
-bool configQuantityMenu(void){
-    uint8_t key = '$';
-    showConfigNsensors();
+bool changeMaxValue(){
+    key = '$';
     while(key == '$'){
         key = scanKeys();
     }
-    if(key == 'A'){
-        menuPtr=setPassword;
-        return false;
-    }
-    else if(key == '*'){
-        return true;
-    }
-    return false;
 }
 
-bool setPassword(void){
-    uint8_t key = '$';
-    showChangePassword();
-    while(key == '$'){
+bool changeTimeValue(){
+    key = '$';
+     while(key == '$'){
         key = scanKeys();
     }
-    if(key == 'A'){
-        menuPtr=configLimitsMenu;
-        return false;
-    }
-    else if(key == '*'){
-        return true;
-    }
-    return false;
-}
-
-bool configSensor(uint8_t sensor){
-    uint8_t key = '$';
-    uint8_t value;
-    bool (*configPtr)(uint8_t *) = configMaxValue;
-    setConfigSensorParam(sensor, readE2p(SENSOR_QUANTITY + sensor), readE2p(SENSOR_QUANTITY + sensor));
-    configPtr(&value);
-    
-    while(1){
-    key = scanKeys();
-    if(key == '#'){
-        configPtr = configPtr == configMaxValue ? configTimeOut : configMaxValue; 
-    }
-    else if(key == '*'){
-        return false;
-    }
-    configPtr(&value);
-    }
-    return true;
-}
-
-bool configMaxValue(uint8_t *value){
-    
-    setConfigSensorParam(2,64,23);
-}
-
-bool configTimeOut(uint8_t *value){
-    setConfigSensorParam(5,33,222);
 }
 
 bool configSensors(void){
     showChangeParam();
-    uint8_t numberOfSensors = readE2p(SENSOR_QUANTITY);
-    for (uint8_t i=0; i < numberOfSensors; i++){
-        if(!configSensor(i)){
-            return false;
-        }
+    key = '$';
+    bool (*changeValuePtr)(void) = changeMaxValue;
+    
+    for(uint8_t i=0; i < Config_numberOfSensors; i++){
+        setConfigSensorParam(i,Config_timeOut[i],Config_maxValues[i]);
+        changeValuePtr();
     }
-    return true;
+    
 }
+

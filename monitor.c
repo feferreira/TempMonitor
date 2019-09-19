@@ -8,28 +8,17 @@
 #include "display.h"
 #include "eeprom.h"
 #include "serial.h"
+#include "config.h"
 
-uint8_t maxValues[8];
-uint8_t timeOut[8];
-uint8_t numberOfSensors = 0;
-uint8_t alarm = 0xFF;
-
-void getE2pValues(){
-    numberOfSensors = readE2p(SENSOR_QUANTITY);
-    for(uint8_t i=0; i < numberOfSensors; i++){
-        maxValues[i] = readE2p(MAX_VALUES + i);
-        timeOut[i] = readE2p(TIMEOUT_VALUES + i);
-    }
-}
 
 bool compareSensor(uint8_t sensor, uint8_t value){
-    return value > maxValues[sensor] ? true : false;
+    return value > Config_maxValues[sensor] ? true : false;
 }
 
 void monitor(){
-        for(uint8_t i=0; i < numberOfSensors; i++){
+        for(uint8_t i=0; i < Config_numberOfSensors; i++){
             uint8_t readValue = getTemp(i);
-            writeSensorValues(i,readValue, maxValues[i]);
+            writeSensorValues(i,readValue, Config_maxValues[i]);
             if(compareSensor(i,readValue)){
                 setDisplayBack(RED);
             }

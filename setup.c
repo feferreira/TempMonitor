@@ -5,12 +5,13 @@
 #include "display.h"
 #include "eeprom.h"
 #include "monitor.h"
+#include "config.h"
 
 void setupPic(void){
     setupPorts();
     setupAd();
     setupSerial();
-    getE2pValues();
+    getConfig();
     setupDisplay();
 }
 
