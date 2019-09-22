@@ -6,8 +6,10 @@
 #include "eeprom.h"
 #include <stdint.h>
 #include "config.h"
+#include "lcd.h"
 
 bool (*menuPtr)(void);
+bool (*changeValuePtr)(uint8_t, bool *, bool *); 
 uint8_t key = '$';
 
 void configMenu(void){
@@ -40,29 +42,139 @@ bool configLimitsMenu(void){
     return false;
 }
 
-bool changeMaxValue(){
+bool changeMaxValue(uint8_t sensor, bool *exit, bool *hasChanges){
+    byte_lcd(LCD_CMD, 0xC6);
+    byte_lcd(LCD_CHAR, '>');
+    byte_lcd(LCD_CMD, 0x86);
+    byte_lcd(LCD_CHAR, ' ');
+    static uint8_t decimal = 0;
+    static uint8_t maxValue = 0;
+    maxValue = !decimal ? 0 : maxValue;
     key = '$';
     while(key == '$'){
         key = scanKeys();
     }
+    if (key == '*'){
+        *exit = true;
+        decimal = 0;
+        return false;
+    }
+    else if(key == '#'){
+        changeValuePtr = changeTimeValue;
+        decimal = 0;
+        return false;
+    }
+    else if(key == 'A'){
+        return true;
+    }
+    else if((key >= '0') & (key <= '9')){
+        key -= 0x30;
+        if(!decimal){
+            decimal = 1;
+            maxValue = key;
+        }
+        else if(decimal == 1){
+            decimal = 2;
+            maxValue = maxValue*10 + key;
+        }
+        else if(decimal == 2){
+            decimal = 0;
+            maxValue = (maxValue/10)*100 + (maxValue%10)*10 + key;
+        }
+        maxValue = maxValue > 150 ? 150 : maxValue;
+        setConfigMaxValue(sensor, maxValue);
+        setChangeMaxValue(maxValue);
+        *hasChanges = true;
+    }
+    return false;
 }
 
-bool changeTimeValue(){
+bool changeTimeValue(uint8_t sensor, bool *exit, bool *hasChanges){
+    byte_lcd(LCD_CMD, 0xC6);
+    byte_lcd(LCD_CHAR, ' ');
+    byte_lcd(LCD_CMD, 0x86);
+    byte_lcd(LCD_CHAR, '>');
+    static uint8_t decimal = 0;
+    static uint8_t TimeValue = 0;
+    TimeValue = !decimal ? 0 : TimeValue;
     key = '$';
-     while(key == '$'){
+    while(key == '$'){
         key = scanKeys();
     }
+        if (key == '*'){
+        *exit = true;
+        decimal = 0;
+        return false;
+    }
+    else if(key == '#'){
+        changeValuePtr = changeMaxValue;
+        decimal = 0;
+        return false;
+    }
+    else if(key == 'A'){
+        return true;
+    }
+    else if((key >= '0') & (key <= '9')){
+        key -= 0x30;
+        if(!decimal){
+            decimal = 1;
+            TimeValue = key;
+        }
+        else if(decimal == 1){
+            decimal = 2;
+            TimeValue = TimeValue*10 + key;
+        }
+        else if(decimal == 2){
+            decimal = 0;
+            TimeValue = (TimeValue/10)*100 + (TimeValue%10)*10 + key;
+        }
+        TimeValue = TimeValue > 120 ? 120 : TimeValue;
+        setConfigTimeOut(sensor, TimeValue);
+        setChangeTimeout(TimeValue);
+        *hasChanges = true;
+    }
+    return false;
 }
 
 bool configSensors(void){
     showChangeParam();
     key = '$';
-    bool (*changeValuePtr)(void) = changeMaxValue;
-    
+    bool exit = false;
+    bool hasChanges = false;
+    changeValuePtr = changeMaxValue;
     for(uint8_t i=0; i < Config_numberOfSensors; i++){
         setConfigSensorParam(i,Config_timeOut[i],Config_maxValues[i]);
-        changeValuePtr();
+        while(!changeValuePtr(i, &exit, &hasChanges)){
+            if(exit){
+                return true;
+            } 
+        }
+        changeValuePtr = changeMaxValue;
     }
-    
+    if(hasChanges){
+        menuPtr = saveConfig;
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+
+bool saveConfig(void){
+    showSaveConfig();
+    key = '$';
+    while(key == '$'){
+        key = scanKeys();
+    }
+    if(key == '*'){
+        return true;
+    }
+    else if(key == '#'){
+        writeConfigSensors();
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 

@@ -13,18 +13,18 @@ void showSplashScreen(void){
 void writeOperationMask(void){
     clr_lcd();
     setDisplayBack(GREEN);
-    text_lcd("SEN:   MAX:    C");
+    text_lcd("SENSOR MAX:    C");
     byte_lcd(LCD_CMD, 0x8E);
     byte_lcd(LCD_CHAR, 0b11011111);
     byte_lcd(LCD_CMD, 0xC0);
-    text_lcd("   TEMP:    C   ");
-    byte_lcd(LCD_CMD, 0xCB);
+    text_lcd("       TMP:    C");
+    byte_lcd(LCD_CMD, 0xCE);
     byte_lcd(LCD_CHAR, 0b11011111);
 }
 
 void writeSensorValues(uint8_t sensor, uint8_t value, uint8_t max){
     setSensorNumber(sensor);
-    byte_lcd(LCD_CMD, 0xC8);
+    byte_lcd(LCD_CMD, 0xCB);
     byte_lcd(LCD_CHAR, value/100 + 0x30);
     byte_lcd(LCD_CHAR, (value%100)/10 + 0x30);
     byte_lcd(LCD_CHAR, (value%100)%10 + 0x30);
@@ -55,26 +55,43 @@ void showChangePassword(void){
 
 void showChangeParam(void){
     clr_lcd();
-    text_lcd("SEN:   TIME:   s");
-    byte_lcd(LCD_CMD, 0xC0);
+    text_lcd("SENSOR TIME:   s");
+    byte_lcd(LCD_CMD, 0xC7);
     text_lcd("MAX:    C");
+    byte_lcd(LCD_CMD, 0xCE);
+    byte_lcd(LCD_CHAR, 0b11011111);
 }
 
 void setSensorNumber(uint8_t sensor){
-    byte_lcd(LCD_CMD, 0x84);
+    byte_lcd(LCD_CMD, 0xC2);
     byte_lcd(LCD_CHAR, 0x30);
     byte_lcd(LCD_CHAR, sensor+0x31);
 }
 
 void setConfigSensorParam(uint8_t sensor, uint8_t time, uint8_t max){
     setSensorNumber(sensor);
-    byte_lcd(LCD_CMD, 0x8C);
-    byte_lcd(LCD_CHAR, time/100 + 0x30);
-    byte_lcd(LCD_CHAR, (time%100)/10 + 0x30);
-    byte_lcd(LCD_CHAR, (time%100)%10 + 0x30);
-    byte_lcd(LCD_CMD, 0xC4);
-    byte_lcd(LCD_CHAR, max/100 + 0x30);
-    byte_lcd(LCD_CHAR, (max%100)/10 + 0x30);
-    byte_lcd(LCD_CHAR, (max%100)%10 + 0x30);
-    
+    setChangeTimeout(time);
+    setChangeMaxValue(max);
 }
+
+void setChangeTimeout(uint8_t value){
+    byte_lcd(LCD_CMD, 0x8C);
+    byte_lcd(LCD_CHAR, value/100 + 0x30);
+    byte_lcd(LCD_CHAR, (value%100)/10 + 0x30);
+    byte_lcd(LCD_CHAR, (value%100)%10 + 0x30);
+}
+
+void setChangeMaxValue(uint8_t value){
+    byte_lcd(LCD_CMD, 0xCB);
+    byte_lcd(LCD_CHAR, value/100 + 0x30);
+    byte_lcd(LCD_CHAR, (value%100)/10 + 0x30);
+    byte_lcd(LCD_CHAR, (value%100)%10 + 0x30);
+}
+
+void showSaveConfig(void){
+    clr_lcd();
+    text_lcd("SALVAR CONFIG.?");
+    byte_lcd(LCD_CMD, 0xC0);
+    text_lcd(" #-SIM    *-NAO ");
+}
+

@@ -11,5 +11,8 @@ void showChangePassword(void);
 void showChangeParam(void);
 void setSensorNumber(uint8_t sensor);
 void setConfigSensorParam(uint8_t sensor, uint8_t time, uint8_t max);
+void setChangeTimeout(uint8_t value);
+void setChangeMaxValue(uint8_t value);
+void showSaveConfig(void);
 
 #endif
