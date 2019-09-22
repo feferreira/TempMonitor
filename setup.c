@@ -13,6 +13,7 @@ void setupPic(void){
     setupSerial();
     getConfig();
     setupDisplay();
+    setupTimer1();
 }
 
 void setupPorts(void){
@@ -22,10 +23,15 @@ void setupPorts(void){
     PORTC = 0x00;
     PORTD = 0x00;
     PORTE = 0xFF;
+    ANSEL = 0xFF;
     ANSELH = 0;
     nRBPU = 0;
     TRISB = 0b00001111;
     PORTB = 0x00;
+    
+    TMR1IE = 1;
+    PEIE = 1;
+
 }
 
 void setupDisplay(void){
@@ -33,7 +39,6 @@ void setupDisplay(void){
     init_lcd();
     showSplashScreen();
     __delay_ms(2000);
-    writeOperationMask();
 }
 
 void setupAd(void){
@@ -54,4 +59,11 @@ void setupSerial(void){
     TXEN = 1; //habilita transmissão serial (TX)
     SPEN = 1; //habilita toda a porta serial
     CREN = 1;
+}
+
+void setupTimer1(void){
+    TMR1CS = 0;
+    T1CKPS0 = 1;
+    T1CKPS1 = 1;
+    TMR1ON = 1;
 }

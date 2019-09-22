@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 void writeE2p(uint8_t address, uint8_t value){
+    GIE = 0;
     EEPGD = 0;
     EEADR = address;
     EEDAT = value;
@@ -16,6 +17,7 @@ void writeE2p(uint8_t address, uint8_t value){
     WREN=0;
 }
 uint8_t readE2p(uint8_t address){
+    GIE = 0;
     EEPGD = 0;
     EEADR = address;
     RD = 1;

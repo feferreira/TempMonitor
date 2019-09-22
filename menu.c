@@ -13,8 +13,15 @@ bool (*changeValuePtr)(uint8_t, bool *, bool *);
 uint8_t key = '$';
 
 void configMenu(void){
+    GIE = 0;
     setDisplayBack(YELLOW);
-    menuPtr = configLimitsMenu;
+    if(Config_coldStart){
+        menuPtr = configQuantityMenu;
+    }
+    else{
+        menuPtr = configLimitsMenu;
+    }
+        
     while(!menuPtr());
     setDisplayBack(GREEN);
 }
@@ -27,7 +34,7 @@ bool configLimitsMenu(void){
     }
     // next Item
     if(key == 'A'){
-        menuPtr=configLimitsMenu;
+        menuPtr=configQuantityMenu;
         return false;
     }
     // exit
@@ -40,6 +47,49 @@ bool configLimitsMenu(void){
         return false;
     }
     return false;
+}
+
+bool configQuantityMenu(void){
+    showConfigNsensors();
+    setSensorQuantity(Config_numberOfSensors);
+    key = '$';
+    static uint8_t decimal = 0;
+    static uint8_t quantity = 0;
+    quantity = !decimal ? 0 : quantity;
+    while(key == '$'){
+        key = scanKeys();
+    }
+    // next Item
+    if(key == 'A'){
+        menuPtr=configLimitsMenu;
+        decimal = 0;
+        return false;
+    }
+    // exit
+    else if(key == '*'){
+        decimal = 0;
+        return true;
+    }
+    // enter menu
+    else if((key >= '0') & (key <= '9')){
+        key -= 0x30;
+        if(!decimal){
+            decimal = 1;
+            quantity = key;
+        }
+        else if(decimal == 1){
+            decimal = 0;
+            quantity = quantity*10 + key;
+        }
+        quantity = quantity > 8 ? 8 : quantity;
+        quantity = quantity < 1 ? 1 : quantity;
+        Config_numberOfSensors = quantity;
+        writeSensorQuantity(quantity);
+    }
+    return false;
+}
+bool changeQuantity(void){
+    
 }
 
 bool changeMaxValue(uint8_t sensor, bool *exit, bool *hasChanges){
@@ -65,6 +115,7 @@ bool changeMaxValue(uint8_t sensor, bool *exit, bool *hasChanges){
         return false;
     }
     else if(key == 'A'){
+        decimal = 0;
         return true;
     }
     else if((key >= '0') & (key <= '9')){

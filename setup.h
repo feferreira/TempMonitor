@@ -22,8 +22,7 @@ void setupAd(void);
 void setupSerial(void);
 void setupEeprom(void);
 void setupDisplay(void);
-void coldStart(void);
-void hotStart(void);
+void setupTimer1(void);
 
 
 #endif

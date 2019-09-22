@@ -8,5 +8,7 @@ bool configLimitsMenu(void);
 bool configSensors(void);
 bool changeTimeValue(uint8_t sensor, bool *exit, bool *hasChanges);
 bool saveConfig(void);
+bool configQuantityMenu(void);
+bool changeQuantity(void);
 
 #endif

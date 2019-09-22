@@ -14,5 +14,6 @@ void setConfigSensorParam(uint8_t sensor, uint8_t time, uint8_t max);
 void setChangeTimeout(uint8_t value);
 void setChangeMaxValue(uint8_t value);
 void showSaveConfig(void);
+void setSensorQuantity(uint8_t value);
 
 #endif

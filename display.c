@@ -45,7 +45,7 @@ void showConfigNsensors(){
     clr_lcd();
     text_lcd("QUANTIDADE DE");
     byte_lcd(LCD_CMD, 0xC0);
-    text_lcd("SENSORES");
+    text_lcd("SENSORES >");
 }
 
 void showChangePassword(void){
@@ -95,3 +95,8 @@ void showSaveConfig(void){
     text_lcd(" #-SIM    *-NAO ");
 }
 
+void setSensorQuantity(uint8_t value){
+    byte_lcd(LCD_CMD, 0xCA);
+    byte_lcd(LCD_CHAR, value/10 + 0x30);
+    byte_lcd(LCD_CHAR, value%10 + 0x30);
+}

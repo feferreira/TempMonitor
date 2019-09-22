@@ -5,11 +5,16 @@
 void startAdConversion(void){
     GO = 1;
     while(nDONE){
+        
         CLRWDT();
     }
 }
 uint16_t readAdResult(void){
-    return (((uint16_t)(ADRESH)) << 8) + ADRESL;
+    uint16_t value = ADRESH;
+    value = value << 8;
+    value += ADRESL;
+    return value;
+    //return (((uint16_t)(ADRESH)) << 8) + ADRESL;
 }
 
 uint8_t convertToTemp(uint16_t adValue){
